@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<title>DWINDLING HOUSES GB</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%239a9eac'/><rect x='4' y='3' width='24' height='18' rx='2' fill='%232a2e3c'/><rect x='6' y='5' width='20' height='14' rx='1' fill='%239bbc0f'/><text x='16' y='14' text-anchor='middle' font-size='9' fill='%230f380f' font-family='monospace' font-weight='bold'>&#x2660;</text><rect x='6' y='23' width='8' height='6' rx='1' fill='%233a3c4a'/><rect x='9' y='23' width='2' height='6' fill='%232a2c3a'/><rect x='6' y='26' width='8' height='2' fill='%232a2c3a'/><circle cx='22' cy='25' r='3' fill='%237a1a80'/><circle cx='28' cy='27' r='2.5' fill='%237a1a80'/></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='20' fill='%239a9eac'/><rect x='16' y='12' width='148' height='100' rx='8' fill='%232a2e3c'/><rect x='22' y='18' width='136' height='88' rx='4' fill='%239bbc0f'/><text x='90' y='58' text-anchor='middle' font-size='28' fill='%230f380f' font-family='monospace' font-weight='bold'>DH</text><text x='90' y='88' text-anchor='middle' font-size='18' fill='%230f380f' font-family='monospace'>♥♠♦♣</text></svg>">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DWINDLING HOUSES">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;image-rendering:pixelated}
+body{background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;font-family:'Press Start 2P',monospace;padding:env(safe-area-inset-top,4px) env(safe-area-inset-right,4px) env(safe-area-inset-bottom,4px) env(safe-area-inset-left,4px);overflow:hidden}
+
+/* ── GB Shell ── */
+.gb-shell{
+  background:linear-gradient(160deg,#b8bcc8 0%,#9a9eac 40%,#8a8e9c 100%);
+  border-radius:14px 14px 36% 36% / 14px 14px 22px 22px;
+  padding:12px 14px 24px;
+  width:min(340px,98vw);
+  box-shadow:inset 0 2px 0 #d0d4e0,inset 0 -4px 0 #6a6e7c,inset -3px 0 0 #7a7e8c,inset 3px 0 0 #7a7e8c,0 12px 40px #00000090;
+  position:relative;user-select:none;transform-origin:top center;overflow:hidden;
+}
+.gb-shell::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.03) 3px,rgba(255,255,255,0.03) 4px);border-radius:inherit;pointer-events:none;}
+.gb-label{text-align:center;font-size:5px;letter-spacing:4px;color:#5a5e6c;text-transform:uppercase;margin-bottom:8px;font-family:'Press Start 2P',monospace;}
+.gb-label span{color:#7a3090;font-size:6px}
+.gb-bezel{background:#2a2e3c;border-radius:8px 8px 4px 4px;padding:8px 8px 6px;box-shadow:inset 0 0 0 2px #1a1e2c,inset 0 0 10px #00000080;margin-bottom:10px;position:relative;}
+.gb-bezel::before{content:'◉ DWINDLING HOUSES';display:block;font-size:4px;color:#4a4e5c;letter-spacing:2px;margin-bottom:6px;font-family:'Press Start 2P',monospace;text-align:center;}
+.gb-power-led{width:5px;height:5px;border-radius:50%;background:#ff2020;box-shadow:0 0 4px #ff2020;position:absolute;top:8px;left:10px;}
+.gb-power-led.on{background:#00ff00;box-shadow:0 0 6px #00ff00}
+
+/* ── Screen ── */
+#gb-screen{width:100%;height:240px;background:#9bbc0f;overflow:hidden;position:relative;border:2px solid #0f380f;display:flex;flex-direction:column;font-family:'Press Start 2P',monospace;font-size:6px;color:#0f380f;cursor:default;}
+#gb-screen::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);pointer-events:none;z-index:100;}
+
+/* ── Screens ── */
+.scr{position:absolute;inset:0;display:flex;flex-direction:column}
+.scr-hidden{display:none!important}
+
+/* Title */
+#scr-title{background:#9bbc0f;align-items:center;justify-content:flex-start;padding:6px 8px;gap:3px}
+.title-logo{font-size:8px;color:#0f380f;text-align:center;line-height:1.6;font-family:'Press Start 2P',monospace;}
+.tmenu-row{display:flex;flex-direction:column;gap:3px;width:100%;padding:0 8px}
+.tmenu-item{font-size:5px;padding:3px 6px;cursor:pointer;border:1px solid #306230;text-align:center;background:#8bac0f;color:#0f380f}
+.tmenu-item.active{background:#0f380f;color:#9bbc0f}
+
+/* Game screen */
+#scr-game{background:#9bbc0f;flex-direction:column}
+.gb-player-half{flex:1;min-height:0;display:flex;flex-direction:column;padding:3px 5px;position:relative;overflow:hidden;}
+.gb-player-half.p2{flex-direction:column-reverse}
+.gb-p-row{display:flex;justify-content:space-between;align-items:center;font-size:5px;color:#0f380f;}
+.gb-p-name{font-size:5px;font-weight:700;color:#0f380f}
+.gb-p-cards{font-size:4px;color:#306230}
+.gb-card-area{flex:1;display:flex;align-items:center;justify-content:center;position:relative;}
+.gb-card{width:40px;height:54px;border:2px solid #0f380f;border-radius:2px;background:#9bbc0f;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#0f380f;position:relative;}
+.gb-card.red{border-color:#0f380f;} /* all same in GB mono */
+.gb-card.face-down{background:#8bac0f;font-size:12px;color:#306230}
+.gb-card.royal{border-width:3px;box-shadow:0 0 0 1px #9bbc0f,0 0 0 2px #0f380f}
+.gb-card.winner{animation:cardWin .3s ease}
+.gb-card.loser{opacity:0.4}
+@keyframes cardWin{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+.gb-card-suit{font-size:14px;line-height:1}
+.gb-card-back-pattern{font-size:16px;color:#306230}
+.gb-discard{position:absolute;right:4px;font-size:4px;color:#306230;text-align:right;}
+.gb-discard.top{top:2px}
+.gb-discard.bot{bottom:2px}
+
+/* Center divider */
+.gb-divider{height:16px;background:#306230;border-top:1px solid #0f380f;border-bottom:1px solid #0f380f;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;}
+.gb-vs-text{font-size:5px;color:#9bbc0f;letter-spacing:2px}
+.gb-result-text{position:absolute;left:0;right:0;text-align:center;font-size:4px;color:#9bbc0f;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* Ticker / log at bottom of game */
+.gb-log{height:10px;background:#0f380f;display:flex;align-items:center;overflow:hidden;flex-shrink:0;border-top:1px solid #306230;}
+.gb-log-inner{white-space:nowrap;font-size:4px;color:#9bbc0f;animation:gbScroll 14s linear infinite;padding-left:100%;}
+@keyframes gbScroll{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+
+/* Stats bar */
+.gb-stats-bar{display:flex;justify-content:space-between;padding:1px 5px;background:#8bac0f;border-top:1px solid #306230;font-size:4px;color:#0f380f;flex-shrink:0}
+
+/* Modal */
+#scr-modal{background:rgba(15,56,15,0.92);align-items:center;justify-content:center;z-index:50}
+.gb-modal-box{background:#9bbc0f;border:3px solid #0f380f;padding:8px 10px;width:240px;font-size:5px;color:#0f380f}
+.gb-modal-title{font-size:6px;border-bottom:1px solid #0f380f;padding-bottom:3px;margin-bottom:5px;text-align:center}
+.gb-modal-row{display:flex;justify-content:space-between;padding:2px 0;font-size:4px;color:#306230;border-bottom:1px dashed #8bac0f}
+.gb-modal-row span{color:#0f380f}
+.gb-modal-hint{font-size:4px;color:#306230;text-align:center;margin-top:5px;animation:gbBlink .6s step-end infinite}
+
+/* Winner */
+#scr-winner{background:#8bac0f;align-items:center;justify-content:center;gap:6px;z-index:60}
+.gb-winner-title{font-size:7px;color:#0f380f;text-align:center;animation:gbBlink .4s step-end infinite}
+.gb-winner-sub{font-size:4px;color:#306230;text-align:center;line-height:1.8}
+
+/* Rules */
+#scr-rules{background:#9bbc0f;padding:5px 6px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.rule-section{border:1px solid #306230;background:#8bac0f}
+.rule-head{background:#306230;color:#9bbc0f;font-size:4px;padding:1px 4px;letter-spacing:1px}
+.rule-row{display:flex;align-items:flex-start;padding:2px 4px;gap:4px;border-bottom:1px solid #306230;font-size:4px;color:#306230}
+.rule-row:last-child{border-bottom:none}
+.rule-row b{color:#0f380f;min-width:8px}
+
+@keyframes gbBlink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Controls */
+.gb-dpad-wrap{display:flex;justify-content:space-between;align-items:center;gap:0;margin-top:6px;padding:0 2px}
+.gb-dpad{position:relative;width:64px;height:64px;flex-shrink:0}
+.gb-dpad-h,.gb-dpad-v{position:absolute;background:#3a3c4a;border-radius:2px}
+.gb-dpad-h{left:0;right:0;top:50%;transform:translateY(-50%);height:22px}
+.gb-dpad-v{top:0;bottom:0;left:50%;transform:translateX(-50%);width:22px}
+.gb-dpad-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:22px;height:22px;background:#2a2c3a;border-radius:1px}
+.gb-dpad-btn{position:absolute;cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center;font-size:8px;color:#6a6e7c}
+.gb-dpad-btn.up{left:0;right:0;top:0;height:22px}
+.gb-dpad-btn.down{left:0;right:0;bottom:0;height:22px}
+.gb-dpad-btn.left{top:0;bottom:0;left:0;width:22px}
+.gb-dpad-btn.right{top:0;bottom:0;right:0;width:22px}
+.gb-mid{display:flex;justify-content:center;gap:16px;flex:1}
+.gb-sys-btn{border:none;cursor:pointer;background:#6a6e7c;border-radius:10px;width:36px;height:10px;transform:rotate(-20deg);box-shadow:0 2px 0 #3a3e4c;font-family:'Press Start 2P',monospace;font-size:4px;color:#9a9eac;display:flex;align-items:center;justify-content:center;outline:none;transition:transform .07s;}
+.gb-sys-btn:active{transform:rotate(-20deg) scale(0.9)}
+.gb-sys-label{font-size:4px;color:#5a5e6c;text-align:center;margin-top:5px;font-family:'Press Start 2P',monospace;}
+.gb-ab{display:flex;align-items:center;gap:8px;transform:rotate(-20deg)}
+.gb-btn{border:none;border-radius:50%;cursor:pointer;font-family:'Press Start 2P',monospace;font-size:5px;color:#fff;font-weight:700;transition:transform .07s,box-shadow .07s;outline:none;}
+.gb-btn:active{transform:scale(0.9);box-shadow:none!important}
+.gb-btn-a{width:32px;height:32px;background:radial-gradient(circle at 35% 35%,#c060b0,#7a1a80);box-shadow:0 4px 0 #4a0a50,0 5px 0 #2a0030;}
+.gb-btn-b{width:28px;height:28px;background:radial-gradient(circle at 35% 35%,#c060b0,#7a1a80);box-shadow:0 3px 0 #4a0a50,0 4px 0 #2a0030;}
+.gb-btn-label{font-size:5px;color:#5a5e6c;text-align:center;margin-top:3px;font-family:'Press Start 2P',monospace;}
+.gb-speaker{display:grid;grid-template-columns:repeat(3,6px);grid-template-rows:repeat(4,6px);gap:3px;margin-right:4px}
+.gb-speaker-dot{width:5px;height:5px;border-radius:50%;background:#7a7e8c;box-shadow:inset 0 1px 0 #6a6e7c}
+.keyboard-hint{font-size:7px;font-family:'Press Start 2P',monospace;color:#2a2e3c;margin-top:10px;text-align:center;line-height:2}
+
+/* Toast */
+#gb-toast{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);background:#0f380f;border:2px solid #306230;padding:4px 10px;font-size:4px;color:#9bbc0f;z-index:60;display:none;text-align:center;}
+#gb-toast .toast-hint{font-size:4px;color:#306230;animation:gbBlink .6s step-end infinite;margin-top:2px}
+</style>
+</head>
+<body>
+
+<div class="gb-shell" id="gb-shell">
+  <div class="gb-label"><span>DWINDLING</span> HOUSES</div>
+  <div class="gb-bezel">
+    <div class="gb-power-led" id="power-led"></div>
+    <div id="gb-screen">
+
+      <!-- TITLE -->
+      <div class="scr" id="scr-title">
+        <div class="title-logo">DWINDLING<br>HOUSES</div>
+        <canvas id="title-canvas" width="256" height="120" style="width:256px;height:120px;display:block;image-rendering:pixelated;flex-shrink:0"></canvas>
+        <div class="tmenu-row">
+          <div class="tmenu-item active" id="tm-0" onclick="titleTap(0)">&#x25B6; DEAL CARDS</div>
+          <div class="tmenu-item" id="tm-1" onclick="titleTap(1)">HOW TO PLAY</div>
+        </div>
+      </div>
+
+      <!-- GAME -->
+      <div class="scr scr-hidden" id="scr-game">
+        <!-- P1 top -->
+        <div class="gb-player-half" id="ph-0">
+          <div class="gb-p-row">
+            <span class="gb-p-name" id="pname-0">P1 — HOUSE I</span>
+            <span class="gb-p-cards"><span id="deck-0">26</span> cards</span>
+          </div>
+          <div class="gb-card-area">
+            <div class="gb-card face-down" id="card-0"><span class="gb-card-back-pattern">♜</span></div>
+          </div>
+          <div class="gb-discard top"><span id="disc-0">0</span> disc</div>
+        </div>
+
+        <!-- Divider -->
+        <div class="gb-divider">
+          <span class="gb-vs-text">VS</span>
+          <div class="gb-result-text" id="result-strip"></div>
+        </div>
+
+        <!-- P2 bottom (flipped) -->
+        <div class="gb-player-half p2" id="ph-1">
+          <div class="gb-p-row">
+            <span class="gb-p-name" id="pname-1">P2 — HOUSE II</span>
+            <span class="gb-p-cards"><span id="deck-1">26</span> cards</span>
+          </div>
+          <div class="gb-card-area">
+            <div class="gb-card face-down" id="card-1"><span class="gb-card-back-pattern">♜</span></div>
+          </div>
+          <div class="gb-discard bot"><span id="disc-1">0</span> disc</div>
+        </div>
+
+        <!-- Stats bar -->
+        <div class="gb-stats-bar">
+          <span>P1 <span id="wins-0">0</span>W</span>
+          <span>TIES <span id="ties">0</span></span>
+          <span>P2 <span id="wins-1">0</span>W</span>
+        </div>
+
+        <!-- Log -->
+        <div class="gb-log"><div class="gb-log-inner" id="gb-log">DWINDLING HOUSES // DEAL CARDS // HIGHER CARD WINS //</div></div>
+
+        <div id="gb-toast">
+          <div id="toast-msg">--</div>
+          <div class="toast-hint">[A] NEXT ROUND</div>
+        </div>
+      </div>
+
+      <!-- MODAL -->
+      <div class="scr scr-hidden" id="scr-modal">
+        <div class="gb-modal-box" id="gb-modal-box">
+          <div class="gb-modal-title" id="gb-modal-title">ROUND</div>
+          <div id="gb-modal-body"></div>
+          <div class="gb-modal-hint" id="gb-modal-hint">PRESS A TO CONTINUE</div>
+        </div>
+      </div>
+
+      <!-- WINNER -->
+      <div class="scr scr-hidden" id="scr-winner">
+        <div style="font-size:20px">♛</div>
+        <div class="gb-winner-title" id="win-title">P1 WINS!</div>
+        <div class="gb-winner-sub" id="win-sub">House II has fallen.</div>
+        <div style="font-size:5px;color:#306230;display:flex;gap:12px;margin-top:4px">
+          <span>P1 <span id="wf-0">0</span>W</span>
+          <span>TIES <span id="wf-t">0</span></span>
+          <span>P2 <span id="wf-1">0</span>W</span>
+        </div>
+        <div style="font-size:4px;color:#306230;margin-top:8px;animation:gbBlink .8s step-end infinite">A = PLAY AGAIN</div>
+      </div>
+
+      <!-- RULES -->
+      <div class="scr scr-hidden" id="scr-rules">
+        <div style="background:#306230;color:#9bbc0f;font-size:5px;padding:2px 6px;letter-spacing:1px;display:flex;justify-content:space-between"><span>HOW TO PLAY</span><span style="font-size:4px">A=BACK</span></div>
+
+        <div class="rule-section">
+          <div class="rule-head">GOAL</div>
+          <div class="rule-row"><b>★</b><span>Drain your opponent's deck to zero cards. Winner keeps their card each round, loser discards.</span></div>
+        </div>
+        <div class="rule-section">
+          <div class="rule-head">BASIC ROUND</div>
+          <div class="rule-row"><b>↑</b><span>Higher card wins. Winner puts card back in deck, loser discards theirs.</span></div>
+          <div class="rule-row"><b>=</b><span>Tie, same color → both discard.</span></div>
+          <div class="rule-row"><b>=</b><span>Tie, red vs black → red wins. Black discards.</span></div>
+        </div>
+        <div class="rule-section">
+          <div class="rule-head">SPECIAL RULES</div>
+          <div class="rule-row"><b>★★</b><span>Royal vs Royal → loser discards played card PLUS 1 extra from their deck.</span></div>
+          <div class="rule-row"><b>3/4</b><span>Lose to a 3 or 4 → loser discards played card PLUS 1 extra from their deck.</span></div>
+        </div>
+        <div class="rule-section">
+          <div class="rule-head">ROYALS</div>
+          <div class="rule-row"><b>J</b><span>Jack · Q Queen · K King · A Ace</span></div>
+        </div>
+        <div style="font-size:4px;color:#306230;text-align:center;padding:3px">A OR START = BACK TO TITLE</div>
+      </div>
+
+    </div><!-- /screen -->
+  </div><!-- /bezel -->
+
+  <!-- Controls -->
+  <div class="gb-dpad-wrap">
+    <div>
+      <div class="gb-dpad">
+        <div class="gb-dpad-h"></div><div class="gb-dpad-v"></div><div class="gb-dpad-center"></div>
+        <div class="gb-dpad-btn up" onclick="gbDpad('up')">▲</div>
+        <div class="gb-dpad-btn down" onclick="gbDpad('down')">▼</div>
+        <div class="gb-dpad-btn left" onclick="gbDpad('left')">◀</div>
+        <div class="gb-dpad-btn right" onclick="gbDpad('right')">▶</div>
+      </div>
+    </div>
+    <div class="gb-mid" style="flex-direction:column;align-items:center;gap:16px">
+      <div class="gb-mid">
+        <div><button class="gb-sys-btn" onclick="gbSelect()">SELECT</button><div class="gb-sys-label">SELECT</div></div>
+        <div><button class="gb-sys-btn" onclick="gbStart()">START</button><div class="gb-sys-label">START</div></div>
+      </div>
+      <div style="font-size:4px;color:#5a5e6c;text-align:center;font-family:'Press Start 2P',monospace;line-height:2">A=DRAW &nbsp; B=BACK<br>SELECT=AUTO-PLAY</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div class="gb-ab">
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <button class="gb-btn gb-btn-b" onclick="gbB()"></button>
+          <div class="gb-btn-label">B</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <button class="gb-btn gb-btn-a" onclick="gbA()"></button>
+          <div class="gb-btn-label">A</div>
+        </div>
+      </div>
+      <div class="gb-speaker" style="align-self:flex-end;margin-bottom:6px">
+        <div class="gb-speaker-dot"></div><div class="gb-speaker-dot"></div><div class="gb-speaker-dot"></div>
+        <div class="gb-speaker-dot"></div><div class="gb-speaker-dot"></div><div class="gb-speaker-dot"></div>
+        <div class="gb-speaker-dot"></div><div class="gb-speaker-dot"></div><div class="gb-speaker-dot"></div>
+        <div class="gb-speaker-dot"></div><div class="gb-speaker-dot"></div><div class="gb-speaker-dot"></div>
+      </div>
+    </div>
+  </div>
+</div><!-- /shell -->
+
+<div class="keyboard-hint">ENTER=A &nbsp; SPACE=B &nbsp; SHIFT=SELECT/AUTO<br>↑↓=MENU &nbsp; ESC=TITLE</div>
+
+<script>
+// ── Audio ─────────────────────────────────────────────────────
+var AC;
+function getAC(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();return AC;}
+function beep(f,d,v,t){try{var ac=getAC(),o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.type=t||'square';o.frequency.value=f;g.gain.setValueAtTime(v||0.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+d);o.start();o.stop(ac.currentTime+d);}catch(e){}}
+function sfxDraw(){beep(440,.04,.08);setTimeout(function(){beep(660,.06,.1)},50);}
+function sfxWin(){beep(523,.08,.1);setTimeout(function(){beep(659,.08,.1)},90);setTimeout(function(){beep(784,.15,.12)},180);}
+function sfxLose(){beep(220,.15,.12,'sawtooth');}
+function sfxTie(){beep(330,.1,.08);}
+function sfxRoyal(){[523,659,784,1047].forEach(function(f,i){setTimeout(function(){beep(f,.12,.12)},i*100)});}
+function sfxBtn(){beep(880,.04,.07);}
+function sfxEnd(){[784,659,523,392].forEach(function(f,i){setTimeout(function(){beep(f,.18,.15,'sawtooth')},i*150)});}
+
+// ── Music ────────────────────────────────────────────────────
+var MUS={nodes:[],loopTimer:null,current:null};
+function musNote(ac,m,f,s,d,v,t){var o=ac.createOscillator(),g=ac.createGain();o.type=t||'square';o.frequency.value=f;g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(v,s+0.01);g.gain.setValueAtTime(v,s+d*0.7);g.gain.linearRampToValueAtTime(0,s+d);o.connect(g);g.connect(m);o.start(s);o.stop(s+d+0.05);MUS.nodes.push(o,g);}
+function musSnare(ac,m,s){var b=ac.createBuffer(1,ac.sampleRate*.08,ac.sampleRate);var d=b.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1);var src=ac.createBufferSource(),g=ac.createGain(),f=ac.createBiquadFilter();f.type='highpass';f.frequency.value=2000;src.buffer=b;g.gain.setValueAtTime(.15,s);g.gain.exponentialRampToValueAtTime(.001,s+.08);src.connect(f);f.connect(g);g.connect(m);src.start(s);MUS.nodes.push(src,g,f);}
+function musKick(ac,m,s){var o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.setValueAtTime(160,s);o.frequency.exponentialRampToValueAtTime(40,s+.08);g.gain.setValueAtTime(.4,s);g.gain.exponentialRampToValueAtTime(.001,s+.1);o.connect(g);g.connect(m);o.start(s);o.stop(s+.12);MUS.nodes.push(o,g);}
+function musStop(){if(MUS.loopTimer){clearTimeout(MUS.loopTimer);MUS.loopTimer=null;}MUS.nodes.forEach(function(n){try{n.stop&&n.stop();n.disconnect&&n.disconnect();}catch(e){}});MUS.nodes=[];MUS.current=null;}
+function playTitle(){
+  musStop();MUS.current='title';
+  var ac=getAC(),m=ac.createGain();m.gain.value=0.10;m.connect(ac.destination);MUS.nodes.push(m);
+  var b=60/138,n=ac.currentTime+.05;
+  // Stately waltz-feel melody in C minor
+  var mel=[261,311,392,349,311,261,233,261, 261,311,392,466,523,466,392,311];
+  mel.forEach(function(f,i){musNote(ac,m,f,n+i*b,b*.8,.14,'square');});
+  var bass=[130,130,155,130,116,130,116,130];
+  for(var i=0;i<16;i++)musNote(ac,m,bass[i%8],n+i*b,b*.4,.08,'triangle');
+  for(var i=0;i<16;i+=3)musKick(ac,m,n+i*b);
+  for(var i=1;i<16;i+=3)musSnare(ac,m,n+i*b);
+  MUS.loopTimer=setTimeout(function(){if(MUS.current==='title')playTitle();},16*b*1000-80);
+}
+function playGame(){
+  musStop();MUS.current='game';
+  var ac=getAC(),m=ac.createGain();m.gain.value=0.10;m.connect(ac.destination);MUS.nodes.push(m);
+  var b=60/155,n=ac.currentTime+.05;
+  var mel=[392,0,349,392,440,392,0,311, 349,0,311,349,392,466,0,392];
+  for(var i=0;i<16;i++){if(mel[i])musNote(ac,m,mel[i],n+i*b,b*.5,.12,'square');}
+  var bass=[196,196,233,196,174,196,174,196];
+  for(var i=0;i<16;i++)musNote(ac,m,bass[i%8],n+i*b,b*.35,.09,'sawtooth');
+  for(var i=0;i<16;i+=2)musKick(ac,m,n+i*b);
+  for(var i=1;i<16;i+=4){musSnare(ac,m,n+i*b);musSnare(ac,m,n+(i+2)*b);}
+  MUS.loopTimer=setTimeout(function(){if(MUS.current==='game')playGame();},16*b*1000-80);
+}
+function musResume(){try{if(AC&&AC.state==='suspended')AC.resume();}catch(e){}}
+
+// ── Screens ──────────────────────────────────────────────────
+var SCREENS=['scr-title','scr-game','scr-modal','scr-winner','scr-rules'];
+function showScreen(id){
+  SCREENS.forEach(function(s){document.getElementById(s).classList.toggle('scr-hidden',s!==id);});
+  musResume();
+  if(id==='scr-title'){if(MUS.current!=='title')playTitle();setTimeout(startTitleAnim,50);}
+  else if(id==='scr-game'){if(MUS.current!=='game')playGame();stopTitleAnim();}
+  else if(id==='scr-winner'){musStop();sfxEnd();}
+}
+function getScr(){for(var i=0;i<SCREENS.length;i++){if(!document.getElementById(SCREENS[i]).classList.contains('scr-hidden'))return SCREENS[i];}return null;}
+
+// ── Title animation ───────────────────────────────────────────
+var titleRAF=null;
+function startTitleAnim(){
+  var cv=document.getElementById('title-canvas');
+  if(!cv)return;
+  var ctx=cv.getContext('2d'),W=256,H=120,t=0;
+  var C={l:'#9bbc0f',m:'#8bac0f',d:'#306230',k:'#0f380f'};
+  var cards=[
+    {cx:60, cy:55,suit:'♠',rank:'K',phase:0},
+    {cx:128,cy:50,suit:'♥',rank:'A',phase:Math.PI*.7},
+    {cx:196,cy:55,suit:'♦',rank:'Q',phase:Math.PI*1.4},
+  ];
+  function drawCard(cx,cy,suit,rank,dy){
+    var x=cx-14,y=cy-20+dy,w=28,h=40;
+    // Shadow
+    ctx.fillStyle='rgba(15,56,15,0.2)';
+    ctx.fillRect(x+2,y+2,w,h);
+    // Card body
+    ctx.fillStyle=C.l;
+    ctx.strokeStyle=C.k;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(x,y,w,h,2);ctx.fill();ctx.stroke();
+    // Suit
+    ctx.font='bold 13px "Press Start 2P",monospace';
+    ctx.fillStyle=C.k;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(suit,cx,cy+4+dy);
+    // Rank
+    ctx.font='bold 7px "Press Start 2P",monospace';
+    ctx.fillText(rank,cx,cy-10+dy);
+  }
+  function frame(){
+    t+=0.022;
+    ctx.fillStyle=C.l;ctx.fillRect(0,0,W,H);
+    // Scanlines
+    for(var y=0;y<H;y+=2){ctx.fillStyle='rgba(15,56,15,0.07)';ctx.fillRect(0,y,W,1);}
+    cards.forEach(function(c){
+      var dy=Math.sin(t+c.phase)*4;
+      drawCard(c.cx,c.cy,c.suit,c.rank,dy);
+    });
+    titleRAF=requestAnimationFrame(frame);
+  }
+  if(titleRAF)cancelAnimationFrame(titleRAF);
+  frame();
+}
+function stopTitleAnim(){if(titleRAF){cancelAnimationFrame(titleRAF);titleRAF=null;}}
+
+// ── Game logic ────────────────────────────────────────────────
+var RANKS=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+var ROYALS={J:1,Q:1,K:1,A:1};
+var SUITS=[{sym:'♠',red:false},{sym:'♥',red:true},{sym:'♦',red:true},{sym:'♣',red:false}];
+var RANK_VAL={};RANKS.forEach(function(r,i){RANK_VAL[r]=i;});
+var LOW={3:1,4:1};
+function makeSuit(idx){return RANKS.map(function(r){return{rank:r,suit:SUITS[idx],val:RANK_VAL[r]};});}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+var G={p1Deck:[],p2Deck:[],p1Pile:[],p2Pile:[],p1Wins:0,p2Wins:0,ties:0,autoTimer:null,autoOn:false,waiting:false,resume:null};
+
+function newGame(){
+  var s=shuffle([0,1,2,3]);
+  G.p1Deck=shuffle(makeSuit(s[0]).concat(makeSuit(s[1])));
+  G.p2Deck=shuffle(makeSuit(s[2]).concat(makeSuit(s[3])));
+  G.p1Pile=[];G.p2Pile=[];G.p1Wins=0;G.p2Wins=0;G.ties=0;
+  G.autoOn=false;if(G.autoTimer){clearInterval(G.autoTimer);G.autoTimer=null;}
+}
+
+function updUI(){
+  document.getElementById('deck-0').textContent=G.p1Deck.length;
+  document.getElementById('deck-1').textContent=G.p2Deck.length;
+  document.getElementById('disc-0').textContent=G.p1Pile.length;
+  document.getElementById('disc-1').textContent=G.p2Pile.length;
+  document.getElementById('wins-0').textContent=G.p1Wins;
+  document.getElementById('wins-1').textContent=G.p2Wins;
+  document.getElementById('ties').textContent=G.ties;
+  document.getElementById('wf-0').textContent=G.p1Wins;
+  document.getElementById('wf-1').textContent=G.p2Wins;
+  document.getElementById('wf-t').textContent=G.ties;
+}
+
+function cardEl(pid){return document.getElementById('card-'+pid);}
+function showCard(pid,card,highlight){
+  var el=cardEl(pid);
+  var suitSym=card.suit.sym;
+  var royal=ROYALS[card.rank]?'royal':'';
+  el.className='gb-card '+(highlight||'')+' '+royal;
+  el.innerHTML='<span style="font-size:11px">'+card.rank+'</span><span class="gb-card-suit">'+suitSym+'</span>';
+}
+function showBack(pid){
+  var el=cardEl(pid);
+  el.className='gb-card face-down';
+  el.innerHTML='<span class="gb-card-back-pattern">♜</span>';
+}
+
+function addLog(msg){
+  var el=document.getElementById('gb-log');
+  el.textContent=msg+' // '+el.textContent.slice(0,80);
+}
+
+function setResult(msg){document.getElementById('result-strip').textContent=msg;}
+
+function toast(msg){
+  document.getElementById('toast-msg').textContent=msg;
+  document.getElementById('gb-toast').style.display='block';
+}
+function hideToast(){document.getElementById('gb-toast').style.display='none';}
+
+function waitResume(){return new Promise(function(r){G.resume=function(){G.resume=null;r();};}); }
+
+async function drawRound(){
+  if(G.p1Deck.length===0||G.p2Deck.length===0){endGame();return;}
+  hideToast();
+  var c1=G.p1Deck.shift(),c2=G.p2Deck.shift();
+  sfxDraw();
+  showCard(0,c1);showCard(1,c2);
+
+  var msg,winner='';
+  function discardExtra(isP1){
+    if(isP1&&G.p1Deck.length>0){G.p1Pile.push(G.p1Deck.shift());return true;}
+    if(!isP1&&G.p2Deck.length>0){G.p2Pile.push(G.p2Deck.shift());return true;}
+    return false;
+  }
+
+  if(c1.val===c2.val){
+    var sameColor=c1.suit.red===c2.suit.red;
+    if(sameColor){
+      G.p1Pile.push(c1);G.p2Pile.push(c2);G.ties++;
+      msg='TIE '+c1.rank+' — SAME COLOR. BOTH DISCARD.';
+      sfxTie();
+      showCard(0,c1,'loser');showCard(1,c2,'loser');
+    } else {
+      var redP1=c1.suit.red;
+      if(redP1){G.p1Deck.push(c1);G.p2Pile.push(c2);G.p1Wins++;sfxWin();showCard(0,c1,'winner');showCard(1,c2,'loser');}
+      else{G.p2Deck.push(c2);G.p1Pile.push(c1);G.p2Wins++;sfxLose();showCard(0,c1,'loser');showCard(1,c2,'winner');}
+      msg='TIE BROKEN — '+(redP1?'P1':'P2')+' RED WINS.';
+      winner=redP1?'P1':'P2';
+    }
+  } else {
+    var p1Won=c1.val>c2.val;
+    var wCard=p1Won?c1:c2,lCard=p1Won?c2:c1;
+    var bothRoyal=ROYALS[c1.rank]&&ROYALS[c2.rank];
+    var lowWin=LOW[wCard.rank];
+    if(p1Won){G.p1Deck.push(wCard);G.p1Pile.length;G.p2Pile.push(lCard);G.p1Wins++;sfxWin();showCard(0,c1,'winner');showCard(1,c2,'loser');}
+    else{G.p2Deck.push(wCard);G.p1Pile.push(lCard);G.p2Wins++;sfxLose();showCard(0,c1,'loser');showCard(1,c2,'winner');}
+    var extra=false;
+    if(bothRoyal){extra=discardExtra(!p1Won);sfxRoyal();msg='\u2605 ROYAL DUEL! '+(p1Won?'P1':'P2')+' WINS. LOSER DISCARDS'+(extra?'+1 EXTRA.':'.');}
+    else if(lowWin){extra=discardExtra(!p1Won);msg=(p1Won?'P1':'P2')+' WINS WITH A '+wCard.rank+'! LOSER DISCARDS'+(extra?'+1 EXTRA.':'.');}
+    else{msg=(p1Won?'P1':'P2')+' WINS! '+wCard.rank+wCard.suit.sym+' BEATS '+lCard.rank+lCard.suit.sym;}
+    winner=p1Won?'P1':'P2';
+  }
+
+  setResult(msg);addLog(msg);updUI();
+
+  if(!G.autoOn){
+    toast(msg.slice(0,30));
+    G.waiting=true;await waitResume();G.waiting=false;
+    hideToast();
+  } else {
+    await new Promise(function(r){setTimeout(r,450);});
+  }
+
+  if(G.p1Deck.length===0||G.p2Deck.length===0){endGame();return;}
+  showBack(0);showBack(1);setResult('');
+}
+
+function endGame(){
+  if(G.autoTimer){clearInterval(G.autoTimer);G.autoTimer=null;G.autoOn=false;}
+  var p1Out=G.p1Deck.length===0,p2Out=G.p2Deck.length===0;
+  updUI();
+  if(p1Out&&p2Out){document.getElementById('win-title').textContent='DRAW!';document.getElementById('win-sub').textContent='Both houses fell together.';}
+  else if(p1Out){document.getElementById('win-title').textContent='P2 WINS!';document.getElementById('win-sub').textContent='House I has fallen.';}
+  else{document.getElementById('win-title').textContent='P1 WINS!';document.getElementById('win-sub').textContent='House II has fallen.';}
+  showScreen('scr-winner');
+}
+
+function startGame(){
+  newGame();updUI();
+  showBack(0);showBack(1);setResult('');hideToast();
+  document.getElementById('power-led').classList.add('on');
+  showScreen('scr-game');
+}
+
+function toggleAuto(){
+  if(G.autoOn){
+    G.autoOn=false;if(G.autoTimer){clearInterval(G.autoTimer);G.autoTimer=null;}
+    if(G.waiting&&G.resume)G.resume();
+  } else {
+    G.autoOn=true;
+    if(G.waiting&&G.resume)G.resume();
+    else{(async function loop(){while(G.autoOn&&G.p1Deck.length>0&&G.p2Deck.length>0){await drawRound();}if(G.p1Deck.length===0||G.p2Deck.length===0)endGame();})();}
+  }
+}
+
+// ── Button handlers ───────────────────────────────────────────
+var titleCursor=0;
+function titleTap(i){sfxBtn();titleCursor=i;updateTitleMenu();}
+function updateTitleMenu(){
+  ['tm-0','tm-1'].forEach(function(id,i){
+    var el=document.getElementById(id);
+    var labels=['DEAL CARDS','HOW TO PLAY'];
+    el.className='tmenu-item'+(i===titleCursor?' active':'');
+    el.textContent=(i===titleCursor?'\u25B6 ':'')+labels[i];
+  });
+}
+function activateTitle(){if(titleCursor===0)startGame();else showScreen('scr-rules');}
+
+function gbDpad(dir){
+  sfxBtn();var s=getScr();
+  if(s==='scr-title'){if(dir==='up')titleCursor=Math.max(0,titleCursor-1);if(dir==='down')titleCursor=Math.min(1,titleCursor+1);updateTitleMenu();}
+}
+function gbA(){
+  musResume();sfxBtn();var s=getScr();
+  if(!MUS.current)playTitle();
+  if(s==='scr-modal'&&G_CONFIRMING_QUIT){G_CONFIRMING_QUIT=false;if(G.autoTimer){clearInterval(G.autoTimer);G.autoTimer=null;G.autoOn=false;}if(G.waiting&&G.resume){var r=G.resume;G.resume=null;r();}musStop();document.getElementById('power-led').classList.remove('on');showScreen('scr-title');return;}
+  if(s==='scr-title'){activateTitle();return;}
+  if(s==='scr-game'){if(G.waiting&&G.resume)G.resume();else if(!G.autoOn)(async function(){await drawRound();})();return;}
+  if(s==='scr-winner'){document.getElementById('power-led').classList.remove('on');showScreen('scr-title');return;}
+  if(s==='scr-rules'){showScreen('scr-title');return;}
+}
+var G_CONFIRMING_QUIT=false;
+function showQuitConfirm(){
+  G_CONFIRMING_QUIT=true;
+  document.getElementById('gb-modal-title').textContent='QUIT?';
+  document.getElementById('gb-modal-body').innerHTML='<div style="font-size:5px;color:#0f380f;text-align:center;padding:4px 0">RETURN TO TITLE?</div><div style="display:flex;gap:8px;justify-content:center;margin-top:4px"><div onclick="gbA()" style="border:2px solid #0f380f;padding:2px 8px;font-size:5px;cursor:pointer;background:#0f380f;color:#9bbc0f">A YES</div><div onclick="gbB()" style="border:2px solid #0f380f;padding:2px 8px;font-size:5px;cursor:pointer">B NO</div></div>';
+  document.getElementById('gb-modal-hint').textContent='';
+  document.getElementById('scr-modal').classList.remove('scr-hidden');
+  SCREENS.forEach(function(s){if(s!=='scr-modal')document.getElementById(s).classList.add('scr-hidden');});
+}
+function gbB(){
+  sfxBtn();var s=getScr();
+  if(s==='scr-modal'&&G_CONFIRMING_QUIT){G_CONFIRMING_QUIT=false;showScreen('scr-game');return;}
+  if(s==='scr-title')return;
+  if(s==='scr-game'){showQuitConfirm();return;}
+  if(s==='scr-rules'){showScreen('scr-title');return;}
+  if(s==='scr-winner'){document.getElementById('power-led').classList.remove('on');showScreen('scr-title');return;}
+}
+function gbSelect(){sfxBtn();var s=getScr();if(s==='scr-game')toggleAuto();}
+function gbStart(){
+  sfxBtn();var s=getScr();
+  if(s==='scr-title'){activateTitle();return;}
+  if(s==='scr-game'){if(G.waiting&&G.resume)G.resume();return;}
+  if(s==='scr-winner'||s==='scr-rules'){document.getElementById('power-led').classList.remove('on');showScreen('scr-title');return;}
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'){gbA();}
+  else if(e.key===' '){e.preventDefault();gbB();}
+  else if(e.key==='Shift'){gbSelect();}
+  else if(e.key==='ArrowUp'){gbDpad('up');}
+  else if(e.key==='ArrowDown'){gbDpad('down');}
+  else if(e.key==='Escape'){var s=getScr();if(s!=='scr-title'){document.getElementById('power-led').classList.remove('on');showScreen('scr-title');}}
+});
+
+// ── Fit shell ─────────────────────────────────────────────────
+function fitShell(){
+  var shell=document.querySelector('.gb-shell');if(!shell)return;
+  shell.style.transform='';shell.style.marginTop='';shell.style.marginBottom='';
+  var aH=window.innerHeight-8,aW=window.innerWidth-8;
+  var sH=shell.offsetHeight,sW=shell.offsetWidth;
+  var scale=Math.min(aH/sH,aW/sW,1.1);
+  var sh=sH*(1-scale);
+  shell.style.transform='scale('+scale.toFixed(3)+')';
+  shell.style.marginTop='-'+Math.round(sh/2)+'px';
+  shell.style.marginBottom='-'+Math.round(sh/2)+'px';
+}
+window.addEventListener('load',function(){setTimeout(fitShell,100);});
+window.addEventListener('resize',fitShell);
+
+// Init
+showScreen('scr-title');
+updateTitleMenu();
+setTimeout(startTitleAnim,100);
+</script>
+</body>
+</html>
