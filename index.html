@@ -66,6 +66,7 @@ body{background:#1a1a2e;display:flex;flex-direction:column;align-items:center;ju
 .gb-discard{position:absolute;right:4px;font-size:4px;color:#306230;text-align:right;}
 .gb-discard.top{top:2px}
 .gb-discard.bot{bottom:2px}
+.discard-canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:5;}
 
 /* Center divider */
 .gb-divider{height:16px;background:#306230;border-top:1px solid #0f380f;border-bottom:1px solid #0f380f;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;}
@@ -164,6 +165,7 @@ body{background:#1a1a2e;display:flex;flex-direction:column;align-items:center;ju
             <div class="gb-card face-down" id="card-0"><span class="gb-card-back-pattern">♜</span></div>
           </div>
           <div class="gb-discard top"><span id="disc-0">0</span> disc</div>
+          <canvas class="discard-canvas" id="discard-canvas-0"></canvas>
         </div>
 
         <!-- Divider -->
@@ -182,6 +184,7 @@ body{background:#1a1a2e;display:flex;flex-direction:column;align-items:center;ju
             <div class="gb-card face-down" id="card-1"><span class="gb-card-back-pattern">♜</span></div>
           </div>
           <div class="gb-discard bot"><span id="disc-1">0</span> disc</div>
+          <canvas class="discard-canvas" id="discard-canvas-1"></canvas>
         </div>
 
         <!-- Stats bar -->
@@ -491,8 +494,8 @@ async function drawRound(){
     if(p1Won){G.p1Deck.push(wCard);G.p1Pile.length;G.p2Pile.push(lCard);G.p1Wins++;sfxWin();showCard(0,c1,'winner');showCard(1,c2,'loser');}
     else{G.p2Deck.push(wCard);G.p1Pile.push(lCard);G.p2Wins++;sfxLose();showCard(0,c1,'loser');showCard(1,c2,'winner');}
     var extra=false;
-    if(bothRoyal){extra=discardExtra(!p1Won);sfxRoyal();msg='\u2605 ROYAL DUEL! '+(p1Won?'P1':'P2')+' WINS. LOSER DISCARDS'+(extra?'+1 EXTRA.':'.');}
-    else if(lowWin){extra=discardExtra(!p1Won);msg=(p1Won?'P1':'P2')+' WINS WITH A '+wCard.rank+'! LOSER DISCARDS'+(extra?'+1 EXTRA.':'.');}
+    if(bothRoyal){extra=discardExtra(!p1Won);sfxRoyal();triggerShake(6,22);triggerFlash('#9bbc0f',10);spawnFaller(!p1Won?0:1,true);msg='\u2605 ROYAL DUEL! '+(p1Won?'P1':'P2')+' WINS. LOSER DISCARDS'+(extra?'+1 EXTRA.':'.');}
+    else if(lowWin){extra=discardExtra(!p1Won);triggerShake(3,12);spawnFaller(!p1Won?0:1,true);msg=(p1Won?'P1':'P2')+' WINS WITH A '+wCard.rank+'! LOSER DISCARDS'+(extra?'+1 EXTRA.':'.');}
     else{msg=(p1Won?'P1':'P2')+' WINS! '+wCard.rank+wCard.suit.sym+' BEATS '+lCard.rank+lCard.suit.sym;}
     winner=p1Won?'P1':'P2';
   }
@@ -613,6 +616,300 @@ function fitShell(){
 }
 window.addEventListener('load',function(){setTimeout(fitShell,100);});
 window.addEventListener('resize',fitShell);
+
+// ── Screen Shake ──────────────────────────────────────────────
+var SHAKE = { active: false, frames: 0, intensity: 0, rafId: null };
+
+function triggerShake(intensity, duration){
+  SHAKE.active = true;
+  SHAKE.intensity = intensity || 5;
+  SHAKE.frames = duration || 18;
+}
+
+function applyShake(){
+  var screen = document.getElementById('gb-screen');
+  if(!screen) return;
+  if(SHAKE.frames > 0){
+    SHAKE.frames--;
+    var decay = SHAKE.frames / 18;
+    var ix = (Math.random()-0.5) * SHAKE.intensity * decay * 2;
+    var iy = (Math.random()-0.5) * SHAKE.intensity * decay * 2;
+    screen.style.transform = 'translate('+ix.toFixed(1)+'px,'+iy.toFixed(1)+'px)';
+    if(SHAKE.frames === 0){
+      screen.style.transform = '';
+      SHAKE.active = false;
+    }
+  }
+}
+
+// ── Flash Overlay ─────────────────────────────────────────────
+var FLASH = { frames: 0, color: '#0f380f', maxFrames: 0 };
+function triggerFlash(color, duration){
+  FLASH.color = color || '#0f380f';
+  FLASH.frames = duration || 8;
+  FLASH.maxFrames = duration || 8;
+}
+
+// ── Discard Pile Visual ───────────────────────────────────────
+var DISCARD_ANIM = {
+  rafId: null,
+  fallers: [[],[]], // falling card particles per player
+  pileAngles: [[],[]], // stable stacked cards per player
+  lastPile: [0,0],
+  frameCount: 0,
+};
+
+var SUITS_SYM = ['♠','♥','♦','♣'];
+var RANKS_SHORT = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+
+function initDiscardCanvases(){
+  [0,1].forEach(function(pid){
+    var ph = document.getElementById('ph-'+pid);
+    var cv = document.getElementById('discard-canvas-'+pid);
+    if(!cv||!ph) return;
+    cv.width = ph.offsetWidth || 150;
+    cv.height = ph.offsetHeight || 80;
+  });
+}
+
+// Compute overall game chaos level 0-1 based on losing player's deck
+function getChaosLevel(){
+  var minDeck = Math.min(G.p1Deck.length, G.p2Deck.length);
+  var totalCards = G.p1Deck.length + G.p2Deck.length + G.p1Pile.length + G.p2Pile.length;
+  // Chaos ramps up as someone gets low on cards
+  // At 26 each = 0, at 5 cards left = 1
+  var desperation = Math.max(0, 1 - minDeck / 10);
+  // Also factor in how many rounds have been played
+  var progress = Math.min(1, (G.p1Pile.length + G.p2Pile.length) / 30);
+  return Math.max(desperation, progress * 0.4);
+}
+
+// Spawn a falling card for player pid
+function spawnFaller(pid, burst){
+  var cv = document.getElementById('discard-canvas-'+pid);
+  if(!cv) return;
+  var W = cv.width, H = cv.height;
+  var chaos = getChaosLevel();
+  var speedMult = 1 + chaos * 2.5; // cards fly faster as chaos grows
+  var rangeMult = 1 + chaos * 1.8; // cards fly farther
+
+  var count = burst ? Math.floor(3 + chaos * 5) : 1;
+  for(var b=0; b<count; b++){
+    var faller = {
+      x: 8 + Math.random()*24,
+      y: pid===0 ? (Math.random()*10) : H - (Math.random()*10),
+      vy: (pid===0 ? 1 : -1) * (0.8 + Math.random()*1.4) * speedMult,
+      vx: (0.2 + Math.random()*0.9) * rangeMult * (Math.random()<0.3?-1:1),
+      rot: (Math.random()-0.5)*0.8,
+      rotV: (Math.random()-0.5) * (0.06 + chaos*0.12),
+      suit: SUITS_SYM[Math.floor(Math.random()*4)],
+      rank: RANKS_SHORT[Math.floor(Math.random()*13)],
+      alpha: 1,
+      life: 0,
+      maxLife: Math.max(25, (55 + Math.random()*35) / speedMult),
+    };
+    DISCARD_ANIM.fallers[pid].push(faller);
+  }
+}
+
+function drawMiniCard(ctx, x, y, w, h, rot, rank, suit, alpha){
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(x + w/2, y + h/2);
+  ctx.rotate(rot);
+  ctx.fillStyle = 'rgba(15,56,15,0.22)';
+  ctx.fillRect(-w/2+1, -h/2+1, w, h);
+  ctx.fillStyle = '#9bbc0f';
+  ctx.strokeStyle = '#0f380f';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  if(ctx.roundRect) ctx.roundRect(-w/2,-h/2,w,h,1);
+  else ctx.rect(-w/2,-h/2,w,h);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#0f380f';
+  ctx.font = 'bold '+(w*0.32)+'px "Press Start 2P",monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(rank, 0, -h*0.12);
+  ctx.font = (w*0.36)+'px "Press Start 2P",monospace';
+  ctx.fillText(suit, 0, h*0.18);
+  ctx.restore();
+}
+
+function drawDiscardPile(pid){
+  var cv = document.getElementById('discard-canvas-'+pid);
+  if(!cv) return;
+  var ph = document.getElementById('ph-'+pid);
+  var W = ph ? (ph.offsetWidth||150) : 150;
+  var H = ph ? (ph.offsetHeight||80) : 80;
+  if(cv.width !== W || cv.height !== H){ cv.width=W; cv.height=H; }
+  var ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  var pileCount = pid===0 ? G.p1Pile.length : G.p2Pile.length;
+  var deckCount = pid===0 ? G.p1Deck.length : G.p2Deck.length;
+  var maxCards = 26;
+  var fill = Math.min(pileCount/maxCards, 1);
+  var chaos = getChaosLevel();
+
+  // Is this player the loser (fewer deck cards than opponent)?
+  var oppDeck = pid===0 ? G.p2Deck.length : G.p1Deck.length;
+  var isLoser = deckCount < oppDeck;
+
+  var t = DISCARD_ANIM.frameCount * 0.04;
+
+  // ── Draw stacked pile ──
+  var cardW = 16, cardH = 22;
+  var maxStack = Math.min(pileCount, 14);
+  var pileX = 6;
+  var pileBaseY = pid===0 ? H-4 : 4;
+
+  // Pile wobble grows with chaos
+  var wobbleMag = isLoser ? chaos * 0.15 : chaos * 0.04;
+
+  while(DISCARD_ANIM.pileAngles[pid].length < 14){
+    var idx = DISCARD_ANIM.pileAngles[pid].length;
+    DISCARD_ANIM.pileAngles[pid].push((Math.sin(idx*137.5)*0.35));
+  }
+
+  for(var i=0; i<maxStack; i++){
+    var angOff = DISCARD_ANIM.pileAngles[pid][i] || 0;
+    var wobble = isLoser ? Math.sin(t*2.5 + i*0.8) * wobbleMag : 0;
+    var spacing = pid===0 ? -(2 + fill*3.5) : (2 + fill*3.5);
+    var cardY, cardX;
+    if(pid===0){
+      cardY = pileBaseY - cardH + i * spacing;
+      cardX = pileX + Math.sin(i*0.9)*2.5*fill + (isLoser ? Math.sin(t+i)*chaos*2 : 0);
+    } else {
+      cardY = pileBaseY + i * spacing;
+      cardX = pileX + Math.sin(i*0.9)*2.5*fill + (isLoser ? Math.sin(t+i)*chaos*2 : 0);
+    }
+
+    ctx.save();
+    ctx.globalAlpha = 0.72 + 0.28*(i/Math.max(maxStack,1));
+    ctx.translate(cardX + cardW/2, cardY + cardH/2);
+    ctx.rotate(angOff + wobble + (fill>0.5 ? Math.sin(i*0.7)*0.09*fill : 0));
+    ctx.fillStyle = '#9bbc0f';
+    ctx.strokeStyle = '#0f380f';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(-cardW/2,-cardH/2,cardW,cardH,1);
+    else ctx.rect(-cardW/2,-cardH/2,cardW,cardH);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#306230';
+    ctx.font = '8px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('♜', 0, 0);
+    ctx.restore();
+  }
+
+  // Count badge
+  if(pileCount > 0){
+    var badgeX = pileX + cardW/2;
+    var badgeY = pid===0 ? pileBaseY - cardH/2 - maxStack*2.5 - 6 : pileBaseY + cardH/2 + maxStack*2.5 + 6;
+    // Badge pulses faster as chaos grows
+    var pulse = isLoser && chaos > 0.3 ? 0.7 + 0.3*Math.sin(t*(4+chaos*6)) : 0.85;
+    ctx.save();
+    ctx.fillStyle = '#0f380f';
+    ctx.globalAlpha = pulse;
+    ctx.fillRect(badgeX-7, badgeY-4, 14, 8);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#9bbc0f';
+    ctx.font = 'bold 5px "Press Start 2P",monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(pileCount, badgeX, badgeY);
+    ctx.restore();
+  }
+
+  // ── Spawn fallers — rate scales with pile size AND chaos ──
+  var spillThreshold = 8;
+  if(pileCount > spillThreshold){
+    // Base rate + chaos multiplier; loser pile spills more
+    var spawnRate = 0.03 * (fill + 0.2) * (1 + chaos * 3) * (isLoser ? 1.6 : 1);
+    if(Math.random() < spawnRate){
+      spawnFaller(pid, false);
+    }
+  }
+
+  // ── Draw + update fallers ──
+  // Gravity increases with chaos (cards accelerate mid-flight in final stretch)
+  var gravityBoost = chaos * 0.04;
+  DISCARD_ANIM.fallers[pid] = DISCARD_ANIM.fallers[pid].filter(function(f){
+    f.vy += (pid===0 ? gravityBoost : -gravityBoost);
+    f.x += f.vx; f.y += f.vy; f.rot += f.rotV; f.life++;
+    var fadeStart = f.maxLife - 15;
+    f.alpha = f.life > fadeStart ? Math.max(0, 1-(f.life-fadeStart)/15) : 1;
+    drawMiniCard(ctx, f.x-8, f.y-11, 16, 22, f.rot, f.rank, f.suit, f.alpha);
+    return f.life < f.maxLife && f.x < W+28 && f.x > -28 && f.y < H+30 && f.y > -30;
+  });
+
+  // ── SPILLING / CHAOS warning text ──
+  var numFallers = DISCARD_ANIM.fallers[pid].length;
+  if(numFallers > 2 && fill > 0.4){
+    var warnAlpha = Math.min(1, (fill-0.4)*2.5) * (0.5 + 0.5*Math.sin(t*8));
+    var warnMsg = chaos > 0.7 ? 'COLLAPSE!' : (chaos > 0.4 ? 'CHAOS!' : 'SPILLING!');
+    ctx.save();
+    ctx.globalAlpha = warnAlpha * 0.75;
+    ctx.fillStyle = '#0f380f';
+    ctx.font = 'bold 4px "Press Start 2P",monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = pid===0 ? 'top' : 'bottom';
+    var warnY = pid===0 ? 2 : H-2;
+    ctx.fillText(warnMsg, pileX + cardW + 4, warnY);
+    ctx.restore();
+  }
+
+  // ── Flash overlay ──
+  if(FLASH.frames > 0 && pid===0){ // only draw once (pid 0)
+    FLASH.frames--;
+    // Handled on screen element, not canvas
+  }
+}
+
+function discardAnimFrame(){
+  DISCARD_ANIM.frameCount++;
+  applyShake();
+
+  // Flash effect on gb-screen
+  var screen = document.getElementById('gb-screen');
+  if(screen && FLASH.frames > 0){
+    var fp = FLASH.frames / FLASH.maxFrames;
+    screen.style.filter = 'brightness('+(1 + fp*0.6)+')';
+    FLASH.frames--;
+    if(FLASH.frames===0) screen.style.filter='';
+  }
+
+  if(document.getElementById('scr-game').classList.contains('scr-hidden')){
+    DISCARD_ANIM.rafId = requestAnimationFrame(discardAnimFrame);
+    return;
+  }
+  drawDiscardPile(0);
+  drawDiscardPile(1);
+  DISCARD_ANIM.rafId = requestAnimationFrame(discardAnimFrame);
+}
+
+function startDiscardAnim(){
+  initDiscardCanvases();
+  if(DISCARD_ANIM.rafId) cancelAnimationFrame(DISCARD_ANIM.rafId);
+  DISCARD_ANIM.fallers=[[],[]];
+  DISCARD_ANIM.pileAngles=[[],[]];
+  DISCARD_ANIM.frameCount=0;
+  DISCARD_ANIM.rafId = requestAnimationFrame(discardAnimFrame);
+}
+
+// Hook into startGame to kick off canvas
+var _origStartGame = startGame;
+startGame = function(){
+  _origStartGame();
+  startDiscardAnim();
+};
+
+// Also restart anim on resize
+window.addEventListener('resize', function(){
+  initDiscardCanvases();
+});
 
 // Init
 showScreen('scr-title');
